@@ -140,12 +140,12 @@
     <div class="zip-row" style="margin-bottom:0.875rem;">
       <div>
         <label for="zip">Your ZIP code</label>
-        <input type="text" id="zip" maxlength="5" placeholder="98003" inputmode="numeric" oninput="updateGasBuddyLink()">
+        <input type="text" id="zip" maxlength="5" placeholder="98003" inputmode="numeric" oninput="updateGasBuddyLink()" value="98003">
       </div>
       <div>
         <label for="gasPrice">Price per gallon</label>
         <div class="input-with-unit">
-          <input type="number" id="gasPrice" step="0.01" min="0" placeholder="5.55">
+          <input type="number" id="gasPrice" step="0.01" min="0" placeholder="5.55" value="5.55">
           <span class="unit">$/gal</span>
         </div>
       </div>
@@ -167,29 +167,69 @@
         </div>
       </div>
       <div class="field">
-        <label for="kwh">kWh charged</label>
-        <div class="input-with-unit">
-          <input type="number" id="kwh" step="0.1" min="0" placeholder="26.3" oninput="calculate()">
-          <span class="unit">kWh</span>
+        <label>Input mode</label>
+        <div class="toggle-group">
+          <button id="btnByKwh" class="active" onclick="setEvMode('kwh')">By kWh</button>
+          <button id="btnByMiles" onclick="setEvMode('miles')">By miles</button>
         </div>
       </div>
-      <div class="field">
-        <label for="evRate">Cost per kWh</label>
-        <div class="input-with-unit">
-          <input type="number" id="evRate" step="0.01" min="0" placeholder="0.09" oninput="calculate()">
-          <span class="unit">$/kWh</span>
-        </div>
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>Efficiency (mi/kWh)</label>
-        <div class="range-inputs">
+
+      <div id="modeKwh">
+        <div class="field">
+          <label for="kwh">kWh charged</label>
           <div class="input-with-unit">
-            <input type="number" id="miLow" step="0.1" min="0" placeholder="3.0" oninput="calculate()">
-            <span class="unit">low</span>
+            <input type="number" id="kwh" step="0.1" min="0" placeholder="26.3" value="26.255" oninput="calculate()">
+            <span class="unit">kWh</span>
           </div>
+        </div>
+        <div class="field">
+          <label for="evRate">Cost per kWh</label>
           <div class="input-with-unit">
-            <input type="number" id="miHigh" step="0.1" min="0" placeholder="4.0" oninput="calculate()">
-            <span class="unit">high</span>
+            <input type="number" id="evRate" step="0.01" min="0" placeholder="0.09" value="0.57" oninput="calculate()">
+            <span class="unit">$/kWh</span>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Efficiency (mi/kWh)</label>
+          <div class="range-inputs">
+            <div class="input-with-unit">
+              <input type="number" id="miLow" step="0.1" min="0" placeholder="3.0" value="3.0" oninput="calculate()">
+              <span class="unit">low</span>
+            </div>
+            <div class="input-with-unit">
+              <input type="number" id="miHigh" step="0.1" min="0" placeholder="4.0" value="4.0" oninput="calculate()">
+              <span class="unit">high</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="modeMiles" style="display:none;">
+        <div class="field">
+          <label for="milesDriven">Miles driven</label>
+          <div class="input-with-unit">
+            <input type="number" id="milesDriven" step="1" min="0" placeholder="90" oninput="calculate()">
+            <span class="unit">mi</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="evRate2">Cost per kWh</label>
+          <div class="input-with-unit">
+            <input type="number" id="evRate2" step="0.01" min="0" placeholder="0.09" value="0.57" oninput="calculate()">
+            <span class="unit">$/kWh</span>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Efficiency (mi/kWh)</label>
+          <div class="range-inputs">
+            <div class="input-with-unit">
+              <input type="number" id="miLow2" step="0.1" min="0" placeholder="3.0" value="3.0" oninput="calculate()">
+              <span class="unit">low</span>
+            </div>
+            <div class="input-with-unit">
+              <input type="number" id="miHigh2" step="0.1" min="0" placeholder="4.0" value="4.0" oninput="calculate()">
+              <span class="unit">high</span>
+            </div>
           </div>
         </div>
       </div>
@@ -203,7 +243,7 @@
       <div class="field">
         <label for="mpg">Fuel economy</label>
         <div class="input-with-unit">
-          <input type="number" id="mpg" step="0.5" min="1" placeholder="17" oninput="calculate()">
+          <input type="number" id="mpg" step="0.5" min="1" placeholder="17" value="17" oninput="calculate()">
           <span class="unit">mpg</span>
         </div>
       </div>
@@ -263,6 +303,24 @@
 
 <script>
 let chargeType = 'home';
+let evMode = 'kwh';
+
+function setEvMode(mode) {
+  evMode = mode;
+  document.getElementById('btnByKwh').classList.toggle('active', mode === 'kwh');
+  document.getElementById('btnByMiles').classList.toggle('active', mode === 'miles');
+  document.getElementById('modeKwh').style.display = mode === 'kwh' ? 'block' : 'none';
+  document.getElementById('modeMiles').style.display = mode === 'miles' ? 'block' : 'none';
+  calculate();
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  setChargeType('away');
+  document.getElementById('evRate').dataset.touched = 'true';
+  document.getElementById('evRate2').dataset.touched = 'true';
+  updateGasBuddyLink();
+  calculate();
+});
 
 function setChargeType(type) {
   chargeType = type;
@@ -279,33 +337,52 @@ function setChargeType(type) {
 }
 
 document.getElementById('evRate').addEventListener('input', function() { this.dataset.touched = 'true'; calculate(); });
+document.getElementById('evRate2').addEventListener('input', function() { this.dataset.touched = 'true'; calculate(); });
 document.getElementById('gasPrice').addEventListener('input', calculate);
 
 function fmt(n) { return '$' + n.toFixed(2); }
 function fmtRange(lo, hi) { return Math.abs(lo - hi) < 0.02 ? fmt(lo) : fmt(lo) + '-' + fmt(hi); }
 
 function calculate() {
-  const kwh = parseFloat(document.getElementById('kwh').value);
-  const evRate = parseFloat(document.getElementById('evRate').value);
-  const miLow = parseFloat(document.getElementById('miLow').value);
-  const miHigh = parseFloat(document.getElementById('miHigh').value);
   const mpg = parseFloat(document.getElementById('mpg').value);
   const gasPrice = parseFloat(document.getElementById('gasPrice').value);
   const gallonsInput = parseFloat(document.getElementById('gallons').value);
-
   const results = document.getElementById('results');
-  const hasEV = !isNaN(kwh) && !isNaN(evRate) && kwh > 0 && evRate > 0;
-  const hasEff = !isNaN(miLow) && !isNaN(miHigh) && miLow > 0 && miHigh > 0;
   const hasGas = !isNaN(mpg) && !isNaN(gasPrice) && mpg > 0 && gasPrice > 0;
 
-  if (!hasEV || !hasGas) { results.classList.remove('visible'); return; }
+  let evTotal, miLo, miHi, miMid, evCpmLo, evCpmHi, hasEV;
 
-  const evTotal = kwh * evRate;
-  const miLo = hasEff ? kwh * miLow : null;
-  const miHi = hasEff ? kwh * miHigh : null;
-  const miMid = hasEff ? kwh * ((miLow + miHigh) / 2) : null;
-  const evCpmLo = hasEff ? evTotal / miHi : null;
-  const evCpmHi = hasEff ? evTotal / miLo : null;
+  if (evMode === 'kwh') {
+    const kwh = parseFloat(document.getElementById('kwh').value);
+    const evRate = parseFloat(document.getElementById('evRate').value);
+    const miLow = parseFloat(document.getElementById('miLow').value);
+    const miHigh = parseFloat(document.getElementById('miHigh').value);
+    const hasEff = !isNaN(miLow) && !isNaN(miHigh) && miLow > 0 && miHigh > 0;
+    hasEV = !isNaN(kwh) && !isNaN(evRate) && kwh > 0 && evRate > 0;
+    if (!hasEV || !hasGas) { results.classList.remove('visible'); return; }
+    evTotal = kwh * evRate;
+    miLo = hasEff ? kwh * miLow : null;
+    miHi = hasEff ? kwh * miHigh : null;
+    miMid = hasEff ? kwh * ((miLow + miHigh) / 2) : null;
+    evCpmLo = hasEff ? evTotal / miHi : null;
+    evCpmHi = hasEff ? evTotal / miLo : null;
+    document.getElementById('evDetail').textContent = kwh + ' kWh x ' + fmt(evRate) + '/kWh';
+  } else {
+    const miles = parseFloat(document.getElementById('milesDriven').value);
+    const evRate2 = parseFloat(document.getElementById('evRate2').value);
+    const miLow2 = parseFloat(document.getElementById('miLow2').value);
+    const miHigh2 = parseFloat(document.getElementById('miHigh2').value);
+    const hasEff2 = !isNaN(miLow2) && !isNaN(miHigh2) && miLow2 > 0 && miHigh2 > 0;
+    hasEV = !isNaN(miles) && !isNaN(evRate2) && miles > 0 && evRate2 > 0 && hasEff2;
+    if (!hasEV || !hasGas) { results.classList.remove('visible'); return; }
+    const kwhLo = miles / miHigh2;
+    const kwhHi = miles / miLow2;
+    const kwhMid = (kwhLo + kwhHi) / 2;
+    evTotal = kwhMid * evRate2;
+    miLo = miles; miHi = miles; miMid = miles;
+    evCpmLo = evTotal / miles; evCpmHi = evTotal / miles;
+    document.getElementById('evDetail').textContent = miles + ' mi, ~' + kwhMid.toFixed(1) + ' kWh x ' + fmt(evRate2) + '/kWh';
+  }
 
   let gasCost, gasGallons, gasMiles;
   if (!isNaN(gallonsInput) && gallonsInput > 0) {
@@ -319,7 +396,6 @@ function calculate() {
   const savingsPerMile = hasEff && miMid ? (gasCpm - ((evCpmLo + evCpmHi) / 2)) : null;
 
   document.getElementById('evCost').textContent = fmt(evTotal);
-  document.getElementById('evDetail').textContent = kwh + ' kWh x ' + fmt(evRate) + '/kWh';
   if (hasEff) {
     document.getElementById('evCpm').textContent = fmtRange(evCpmLo, evCpmHi) + ' per mile';
     document.getElementById('milesRange').textContent = Math.round(miLo) + '-' + Math.round(miHi) + ' mi';
