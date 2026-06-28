@@ -350,14 +350,14 @@ function calculate() {
   const results = document.getElementById('results');
   const hasGas = !isNaN(mpg) && !isNaN(gasPrice) && mpg > 0 && gasPrice > 0;
 
-  let evTotal, miLo, miHi, miMid, evCpmLo, evCpmHi, hasEV;
+  let evTotal, miLo, miHi, miMid, evCpmLo, evCpmHi, hasEV, hasEff;
 
   if (evMode === 'kwh') {
     const kwh = parseFloat(document.getElementById('kwh').value);
     const evRate = parseFloat(document.getElementById('evRate').value);
     const miLow = parseFloat(document.getElementById('miLow').value);
     const miHigh = parseFloat(document.getElementById('miHigh').value);
-    const hasEff = !isNaN(miLow) && !isNaN(miHigh) && miLow > 0 && miHigh > 0;
+    hasEff = !isNaN(miLow) && !isNaN(miHigh) && miLow > 0 && miHigh > 0;
     hasEV = !isNaN(kwh) && !isNaN(evRate) && kwh > 0 && evRate > 0;
     if (!hasEV || !hasGas) { results.classList.remove('visible'); return; }
     evTotal = kwh * evRate;
@@ -372,8 +372,8 @@ function calculate() {
     const evRate2 = parseFloat(document.getElementById('evRate2').value);
     const miLow2 = parseFloat(document.getElementById('miLow2').value);
     const miHigh2 = parseFloat(document.getElementById('miHigh2').value);
-    const hasEff2 = !isNaN(miLow2) && !isNaN(miHigh2) && miLow2 > 0 && miHigh2 > 0;
-    hasEV = !isNaN(miles) && !isNaN(evRate2) && miles > 0 && evRate2 > 0 && hasEff2;
+    hasEff = !isNaN(miLow2) && !isNaN(miHigh2) && miLow2 > 0 && miHigh2 > 0;
+    hasEV = !isNaN(miles) && !isNaN(evRate2) && miles > 0 && evRate2 > 0 && hasEff;
     if (!hasEV || !hasGas) { results.classList.remove('visible'); return; }
     const kwhLo = miles / miHigh2;
     const kwhHi = miles / miLow2;
